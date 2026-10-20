@@ -110,6 +110,33 @@ export type Database = {
         }
         Relationships: []
       }
+      clientes: {
+        Row: {
+          apellido: string
+          created_at: string
+          id: string
+          nombre: string
+          observaciones: string | null
+          telefono: string
+        }
+        Insert: {
+          apellido?: string
+          created_at?: string
+          id?: string
+          nombre: string
+          observaciones?: string | null
+          telefono?: string
+        }
+        Update: {
+          apellido?: string
+          created_at?: string
+          id?: string
+          nombre?: string
+          observaciones?: string | null
+          telefono?: string
+        }
+        Relationships: []
+      }
       compras: {
         Row: {
           comprobante: string | null
@@ -294,6 +321,219 @@ export type Database = {
           },
         ]
       }
+      encargo_historial: {
+        Row: {
+          accion: string
+          detalle: string | null
+          encargo_id: string
+          fecha: string
+          id: string
+          usuario_id: string | null
+        }
+        Insert: {
+          accion: string
+          detalle?: string | null
+          encargo_id: string
+          fecha?: string
+          id?: string
+          usuario_id?: string | null
+        }
+        Update: {
+          accion?: string
+          detalle?: string | null
+          encargo_id?: string
+          fecha?: string
+          id?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "encargo_historial_encargo_id_fkey"
+            columns: ["encargo_id"]
+            isOneToOne: false
+            referencedRelation: "encargos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      encargo_items: {
+        Row: {
+          cantidad: number
+          descripcion: string
+          encargo_id: string
+          id: string
+          precio_unitario: number
+          producto_id: string | null
+          servicio_id: string | null
+          subtotal: number
+        }
+        Insert: {
+          cantidad: number
+          descripcion: string
+          encargo_id: string
+          id?: string
+          precio_unitario: number
+          producto_id?: string | null
+          servicio_id?: string | null
+          subtotal: number
+        }
+        Update: {
+          cantidad?: number
+          descripcion?: string
+          encargo_id?: string
+          id?: string
+          precio_unitario?: number
+          producto_id?: string | null
+          servicio_id?: string | null
+          subtotal?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "encargo_items_encargo_id_fkey"
+            columns: ["encargo_id"]
+            isOneToOne: false
+            referencedRelation: "encargos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "encargo_items_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "encargo_items_servicio_id_fkey"
+            columns: ["servicio_id"]
+            isOneToOne: false
+            referencedRelation: "servicios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      encargo_pagos: {
+        Row: {
+          caja_id: string | null
+          encargo_id: string
+          fecha: string
+          id: string
+          importe: number
+          metodo_pago: Database["public"]["Enums"]["metodo_pago"]
+          usuario_id: string | null
+        }
+        Insert: {
+          caja_id?: string | null
+          encargo_id: string
+          fecha?: string
+          id?: string
+          importe: number
+          metodo_pago: Database["public"]["Enums"]["metodo_pago"]
+          usuario_id?: string | null
+        }
+        Update: {
+          caja_id?: string | null
+          encargo_id?: string
+          fecha?: string
+          id?: string
+          importe?: number
+          metodo_pago?: Database["public"]["Enums"]["metodo_pago"]
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "encargo_pagos_caja_id_fkey"
+            columns: ["caja_id"]
+            isOneToOne: false
+            referencedRelation: "cajas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "encargo_pagos_encargo_id_fkey"
+            columns: ["encargo_id"]
+            isOneToOne: false
+            referencedRelation: "encargos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      encargos: {
+        Row: {
+          cancelado_at: string | null
+          cancelado_por: string | null
+          cliente_id: string | null
+          created_at: string
+          entregado_at: string | null
+          entregado_por: string | null
+          estado: Database["public"]["Enums"]["estado_encargo"]
+          fecha_retiro: string | null
+          id: string
+          motivo_cancelacion: string | null
+          numero: string
+          observaciones: string | null
+          pagado: number
+          telefono: string
+          total: number
+          updated_at: string
+          usuario_id: string | null
+          venta_id: string | null
+        }
+        Insert: {
+          cancelado_at?: string | null
+          cancelado_por?: string | null
+          cliente_id?: string | null
+          created_at?: string
+          entregado_at?: string | null
+          entregado_por?: string | null
+          estado?: Database["public"]["Enums"]["estado_encargo"]
+          fecha_retiro?: string | null
+          id?: string
+          motivo_cancelacion?: string | null
+          numero: string
+          observaciones?: string | null
+          pagado?: number
+          telefono?: string
+          total?: number
+          updated_at?: string
+          usuario_id?: string | null
+          venta_id?: string | null
+        }
+        Update: {
+          cancelado_at?: string | null
+          cancelado_por?: string | null
+          cliente_id?: string | null
+          created_at?: string
+          entregado_at?: string | null
+          entregado_por?: string | null
+          estado?: Database["public"]["Enums"]["estado_encargo"]
+          fecha_retiro?: string | null
+          id?: string
+          motivo_cancelacion?: string | null
+          numero?: string
+          observaciones?: string | null
+          pagado?: number
+          telefono?: string
+          total?: number
+          updated_at?: string
+          usuario_id?: string | null
+          venta_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "encargos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "encargos_venta_id_fkey"
+            columns: ["venta_id"]
+            isOneToOne: true
+            referencedRelation: "ventas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       movimientos_caja: {
         Row: {
           caja_id: string | null
@@ -407,6 +647,7 @@ export type Database = {
           stock_actual: number
           stock_minimo: number
           stock_objetivo: number
+          stock_reservado: number
           tipo: Database["public"]["Enums"]["tipo_item"]
           unidad: string
           updated_at: string
@@ -428,6 +669,7 @@ export type Database = {
           stock_actual?: number
           stock_minimo?: number
           stock_objetivo?: number
+          stock_reservado?: number
           tipo?: Database["public"]["Enums"]["tipo_item"]
           unidad?: string
           updated_at?: string
@@ -449,6 +691,7 @@ export type Database = {
           stock_actual?: number
           stock_minimo?: number
           stock_objetivo?: number
+          stock_reservado?: number
           tipo?: Database["public"]["Enums"]["tipo_item"]
           unidad?: string
           updated_at?: string
@@ -707,6 +950,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      _encargo_liberar_reservas: { Args: { p_id: string }; Returns: undefined }
       anular_venta: {
         Args: { p_motivo: string; p_venta_id: string }
         Returns: undefined
@@ -716,6 +960,22 @@ export type Database = {
         Returns: Database["public"]["Enums"]["app_role"]
       }
       caja_abierta_actual: { Args: never; Returns: string }
+      cambiar_estado_encargo: {
+        Args: {
+          p_estado: Database["public"]["Enums"]["estado_encargo"]
+          p_id: string
+        }
+        Returns: undefined
+      }
+      cancelar_encargo: {
+        Args: {
+          p_devolver: boolean
+          p_id: string
+          p_metodo: Database["public"]["Enums"]["metodo_pago"]
+          p_motivo: string
+        }
+        Returns: undefined
+      }
       cerrar_caja: {
         Args: {
           p_caja_id: string
@@ -773,6 +1033,70 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      finalizar_encargo: {
+        Args: {
+          p_id: string
+          p_metodo: Database["public"]["Enums"]["metodo_pago"]
+        }
+        Returns: {
+          anulada_at: string | null
+          anulada_por: string | null
+          caja_id: string | null
+          descuento: number
+          estado: Database["public"]["Enums"]["estado_venta"]
+          fecha: string
+          id: string
+          metodo_pago: Database["public"]["Enums"]["metodo_pago"]
+          motivo_anulacion: string | null
+          numero: string
+          observaciones: string | null
+          subtotal: number
+          total: number
+          usuario_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "ventas"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      guardar_encargo: {
+        Args: {
+          p_cliente_id: string
+          p_fecha_retiro: string
+          p_id: string
+          p_items: Json
+          p_observaciones: string
+          p_telefono: string
+        }
+        Returns: {
+          cancelado_at: string | null
+          cancelado_por: string | null
+          cliente_id: string | null
+          created_at: string
+          entregado_at: string | null
+          entregado_por: string | null
+          estado: Database["public"]["Enums"]["estado_encargo"]
+          fecha_retiro: string | null
+          id: string
+          motivo_cancelacion: string | null
+          numero: string
+          observaciones: string | null
+          pagado: number
+          telefono: string
+          total: number
+          updated_at: string
+          usuario_id: string | null
+          venta_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "encargos"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -799,11 +1123,25 @@ export type Database = {
         }
         Returns: undefined
       }
+      registrar_pago_encargo: {
+        Args: {
+          p_id: string
+          p_importe: number
+          p_metodo: Database["public"]["Enums"]["metodo_pago"]
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "vendedor"
       clase_servicio: "fotocopia" | "impresion"
       estado_compra: "borrador" | "confirmada" | "anulada"
+      estado_encargo:
+        | "pendiente"
+        | "en_proceso"
+        | "listo"
+        | "finalizado"
+        | "cancelado"
       estado_venta: "confirmada" | "anulada"
       metodo_pago:
         | "efectivo"
@@ -957,6 +1295,13 @@ export const Constants = {
       app_role: ["admin", "vendedor"],
       clase_servicio: ["fotocopia", "impresion"],
       estado_compra: ["borrador", "confirmada", "anulada"],
+      estado_encargo: [
+        "pendiente",
+        "en_proceso",
+        "listo",
+        "finalizado",
+        "cancelado",
+      ],
       estado_venta: ["confirmada", "anulada"],
       metodo_pago: [
         "efectivo",
