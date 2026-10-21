@@ -8,6 +8,13 @@
       "when": 1792456658088,
       "tag": "0000_modulo_encargos",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792549480419,
+      "tag": "0001_control_contadores",
+      "breakpoints": true
     }
   ]
 }
