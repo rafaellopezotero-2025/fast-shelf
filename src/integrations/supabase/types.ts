@@ -211,6 +211,97 @@ export type Database = {
         }
         Relationships: []
       }
+      contadores: {
+        Row: {
+          contador_final: number | null
+          contador_inicial: number
+          created_at: string
+          fecha: string
+          id: string
+          maquina_id: string
+          observaciones: string | null
+          turno: Database["public"]["Enums"]["turno"]
+          updated_at: string
+          usuario_id: string | null
+        }
+        Insert: {
+          contador_final?: number | null
+          contador_inicial: number
+          created_at?: string
+          fecha: string
+          id?: string
+          maquina_id: string
+          observaciones?: string | null
+          turno: Database["public"]["Enums"]["turno"]
+          updated_at?: string
+          usuario_id?: string | null
+        }
+        Update: {
+          contador_final?: number | null
+          contador_inicial?: number
+          created_at?: string
+          fecha?: string
+          id?: string
+          maquina_id?: string
+          observaciones?: string | null
+          turno?: Database["public"]["Enums"]["turno"]
+          updated_at?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contadores_maquina_id_fkey"
+            columns: ["maquina_id"]
+            isOneToOne: false
+            referencedRelation: "maquinas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contadores_historial: {
+        Row: {
+          contador_id: string
+          fecha: string
+          final_anterior: number | null
+          final_nuevo: number | null
+          id: string
+          inicial_anterior: number | null
+          inicial_nuevo: number | null
+          observaciones: string | null
+          usuario_id: string | null
+        }
+        Insert: {
+          contador_id: string
+          fecha?: string
+          final_anterior?: number | null
+          final_nuevo?: number | null
+          id?: string
+          inicial_anterior?: number | null
+          inicial_nuevo?: number | null
+          observaciones?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          contador_id?: string
+          fecha?: string
+          final_anterior?: number | null
+          final_nuevo?: number | null
+          id?: string
+          inicial_anterior?: number | null
+          inicial_nuevo?: number | null
+          observaciones?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contadores_historial_contador_id_fkey"
+            columns: ["contador_id"]
+            isOneToOne: false
+            referencedRelation: "contadores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       detalle_compras: {
         Row: {
           cantidad: number
@@ -260,6 +351,7 @@ export type Database = {
           costo_unitario: number
           descripcion: string
           id: string
+          maquina_id: string | null
           precio_unitario: number
           producto_id: string | null
           servicio_id: string | null
@@ -272,6 +364,7 @@ export type Database = {
           costo_unitario?: number
           descripcion: string
           id?: string
+          maquina_id?: string | null
           precio_unitario: number
           producto_id?: string | null
           servicio_id?: string | null
@@ -284,6 +377,7 @@ export type Database = {
           costo_unitario?: number
           descripcion?: string
           id?: string
+          maquina_id?: string | null
           precio_unitario?: number
           producto_id?: string | null
           servicio_id?: string | null
@@ -296,6 +390,13 @@ export type Database = {
             columns: ["categoria_id"]
             isOneToOne: false
             referencedRelation: "categorias"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "detalle_ventas_maquina_id_fkey"
+            columns: ["maquina_id"]
+            isOneToOne: false
+            referencedRelation: "maquinas"
             referencedColumns: ["id"]
           },
           {
@@ -456,6 +557,68 @@ export type Database = {
           },
         ]
       }
+      encargo_trabajos: {
+        Row: {
+          cantidad: number
+          encargo_id: string
+          encargo_item_id: string
+          fecha: string
+          id: string
+          maquina_id: string | null
+          servicio_id: string
+          usuario_id: string | null
+        }
+        Insert: {
+          cantidad: number
+          encargo_id: string
+          encargo_item_id: string
+          fecha?: string
+          id?: string
+          maquina_id?: string | null
+          servicio_id: string
+          usuario_id?: string | null
+        }
+        Update: {
+          cantidad?: number
+          encargo_id?: string
+          encargo_item_id?: string
+          fecha?: string
+          id?: string
+          maquina_id?: string | null
+          servicio_id?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "encargo_trabajos_encargo_id_fkey"
+            columns: ["encargo_id"]
+            isOneToOne: false
+            referencedRelation: "encargos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "encargo_trabajos_encargo_item_id_fkey"
+            columns: ["encargo_item_id"]
+            isOneToOne: false
+            referencedRelation: "encargo_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "encargo_trabajos_maquina_id_fkey"
+            columns: ["maquina_id"]
+            isOneToOne: false
+            referencedRelation: "maquinas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "encargo_trabajos_servicio_id_fkey"
+            columns: ["servicio_id"]
+            isOneToOne: false
+            referencedRelation: "servicios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       encargos: {
         Row: {
           cancelado_at: string | null
@@ -533,6 +696,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      maquinas: {
+        Row: {
+          activo: boolean
+          created_at: string
+          id: string
+          nombre: string
+          tipo: string
+        }
+        Insert: {
+          activo?: boolean
+          created_at?: string
+          id?: string
+          nombre: string
+          tipo?: string
+        }
+        Update: {
+          activo?: boolean
+          created_at?: string
+          id?: string
+          nombre?: string
+          tipo?: string
+        }
+        Relationships: []
       }
       movimientos_caja: {
         Row: {
@@ -1002,6 +1189,19 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      comparar_contadores: {
+        Args: { p_fecha: string; p_turno: Database["public"]["Enums"]["turno"] }
+        Returns: {
+          activo: boolean
+          contador_final: number
+          contador_inicial: number
+          encargos: number
+          maquina: string
+          maquina_id: string
+          segun_contador: number
+          ventas: number
+        }[]
+      }
       confirmar_compra: { Args: { p_compra_id: string }; Returns: undefined }
       crear_venta: {
         Args: {
@@ -1061,6 +1261,34 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      guardar_contador: {
+        Args: {
+          p_fecha: string
+          p_final: number
+          p_inicial: number
+          p_maquina_id: string
+          p_observaciones: string
+          p_turno: Database["public"]["Enums"]["turno"]
+        }
+        Returns: {
+          contador_final: number | null
+          contador_inicial: number
+          created_at: string
+          fecha: string
+          id: string
+          maquina_id: string
+          observaciones: string | null
+          turno: Database["public"]["Enums"]["turno"]
+          updated_at: string
+          usuario_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "contadores"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       guardar_encargo: {
         Args: {
           p_cliente_id: string
@@ -1114,6 +1342,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      rango_turno: {
+        Args: { p_fecha: string; p_turno: Database["public"]["Enums"]["turno"] }
+        Returns: Record<string, unknown>
+      }
       registrar_movimiento_stock: {
         Args: {
           p_cantidad: number
@@ -1129,6 +1361,10 @@ export type Database = {
           p_importe: number
           p_metodo: Database["public"]["Enums"]["metodo_pago"]
         }
+        Returns: undefined
+      }
+      registrar_trabajo_encargo: {
+        Args: { p_cantidad: number; p_item_id: string; p_maquina_id: string }
         Returns: undefined
       }
     }
@@ -1165,6 +1401,7 @@ export type Database = {
         | "venta"
         | "anulacion"
         | "compra"
+      turno: "manana" | "tarde"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1328,6 +1565,7 @@ export const Constants = {
         "anulacion",
         "compra",
       ],
+      turno: ["manana", "tarde"],
     },
   },
 } as const
