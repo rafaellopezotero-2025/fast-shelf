@@ -8,7 +8,7 @@ export const ESTADOS_ENCARGO: { value: EstadoEncargo; label: string; className: 
   { value: "cancelado", label: "Cancelado", className: "bg-destructive/10 text-destructive border-destructive/20" },
 ];
 
-export const estadoInfo = (e: string) => ESTADOS_ENCARGO.find((x) => x.value === e) ?? ESTADOS_ENCARGO[0];
+export const estadoInfo = (e: string) => ESTADOS_ENCARGO.find((x) => x.value === e) ?? ESTADOS_ENCARGO[0]!;
 
 export const editable = (e: string) => e === "pendiente" || e === "en_proceso" || e === "listo";
 
