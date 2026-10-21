@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- Encargos: all money/stock changes go through SECURITY DEFINER RPCs (guardar/registrar_pago/cambiar_estado/cancelar/finalizar_encargo); stock available = stock_actual - stock_reservado. Why: atomic, concurrency-safe, no double counting in caja/ventas.
+- New migrations must also be copied to supabase/migrations/ so scripts/init-local-db.sh applies them on the offline Ubuntu install.

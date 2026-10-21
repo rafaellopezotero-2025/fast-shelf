@@ -317,13 +317,13 @@ function FormEncargo({ id, onClose }: { id: string | null; onClose: (nuevoId?: s
   };
 
   const guardarCliente = async () => {
-    if (!nuevoCli || !nuevoCli.nombre.trim()) return toast.error("El nombre del cliente es obligatorio");
+    if (!nuevoCli || !nuevoCli.nombre.trim()) { toast.error("El nombre del cliente es obligatorio"); return; }
     const { data, error } = await supabase
       .from("clientes")
       .insert({ nombre: nuevoCli.nombre.trim(), apellido: nuevoCli.apellido.trim(), telefono: nuevoCli.telefono.trim() })
       .select()
       .single();
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     await qc.invalidateQueries({ queryKey: ["clientes"] });
     setClienteId(data.id);
     if (!telefono) setTelefono(data.telefono);
@@ -333,12 +333,12 @@ function FormEncargo({ id, onClose }: { id: string | null; onClose: (nuevoId?: s
   };
 
   const guardar = async () => {
-    if (!items.length) return toast.error("Agregá al menos un producto o servicio");
+    if (!items.length) { toast.error("Agregá al menos un producto o servicio"); return; }
     if (items.some((i) => !(i.cantidad > 0) || !(i.precio_unitario >= 0)))
-      return toast.error("Revisá cantidades y precios: deben ser números válidos");
+      { toast.error("Revisá cantidades y precios: deben ser números válidos"); return; }
     const senaN = sena.trim() ? Number(sena) : 0;
-    if (!Number.isFinite(senaN) || senaN < 0) return toast.error("La seña debe ser un número no negativo");
-    if (senaN > total) return toast.error("La seña no puede superar el total del encargo");
+    if (!Number.isFinite(senaN) || senaN < 0) { toast.error("La seña debe ser un número no negativo"); return; }
+    if (senaN > total) { toast.error("La seña no puede superar el total del encargo"); return; }
     setGuardando(true);
     const { data, error } = await supabase.rpc("guardar_encargo", {
       p_id: id as string,
@@ -350,7 +350,7 @@ function FormEncargo({ id, onClose }: { id: string | null; onClose: (nuevoId?: s
     });
     if (error) {
       setGuardando(false);
-      return toast.error(errMsg(error));
+      { toast.error(errMsg(error)); return; }
     }
     const enc = data as unknown as { id: string; numero: string };
     if (senaN > 0) {
@@ -558,7 +558,7 @@ function DetalleEncargo({ id, onClose, onEditar }: { id: string; onClose: () => 
     setOcupado(true);
     const { error } = await fn();
     setOcupado(false);
-    if (error) return toast.error(errMsg(error));
+    if (error) { toast.error(errMsg(error)); return; }
     toast.success(ok);
     setModo("ver");
     setPago("");
@@ -653,7 +653,7 @@ function DetalleEncargo({ id, onClose, onEditar }: { id: string; onClose: () => 
                   variant="outline"
                   disabled={ocupado || !(Number(pago) > 0)}
                   onClick={() => {
-                    if (Number(pago) > saldo) return toast.error(`El pago supera el saldo pendiente (${money(saldo)})`);
+                    if (Number(pago) > saldo) { toast.error(`El pago supera el saldo pendiente (${money(saldo)})`); return; }
                     void run(() => supabase.rpc("registrar_pago_encargo", { p_id: id, p_importe: Number(pago), p_metodo: metodo as never }), "Pago registrado");
                   }}
                 >
