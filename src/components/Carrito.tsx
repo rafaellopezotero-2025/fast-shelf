@@ -63,6 +63,7 @@ export function Carrito({
   titulo?: string;
 }) {
   const qc = useQueryClient();
+  const maquinasQ = useMaquinas();
   const [metodo, setMetodo] = useState<string>("efectivo");
   const [descuento, setDescuento] = useState("0");
   const [obs, setObs] = useState("");
