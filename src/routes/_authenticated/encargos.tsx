@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useCatalogo } from "@/components/Carrito";
 import { fechaHora, labelMetodo, money, METODOS_PAGO } from "@/lib/format";
+import { TrabajosRealizados } from "@/components/TrabajosRealizados";
 import { ESTADOS_ENCARGO, editable, estadoInfo, saldoEncargo, type EstadoEncargo } from "@/lib/encargos";
 
 export const Route = createFileRoute("/_authenticated/encargos")({
@@ -617,6 +618,8 @@ function DetalleEncargo({ id, onClose, onEditar }: { id: string; onClose: () => 
             ))}
           </TableBody>
         </Table>
+
+        <TrabajosRealizados encargoId={id} activo={e.estado !== "cancelado"} items={items.filter((i) => i.servicio_id)} />
 
         <div className="grid grid-cols-3 gap-2 rounded-lg border p-3 text-center">
           <div><p className="text-xs text-muted-foreground">Total</p><p className="font-semibold tabular">{money(e.total)}</p></div>

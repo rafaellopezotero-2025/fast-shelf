@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { money, METODOS_PAGO } from "@/lib/format";
+import { useMaquinas } from "@/lib/maquinas";
 
 export type ItemCarrito = {
   key: string;
@@ -19,6 +20,7 @@ export type ItemCarrito = {
   cantidad: number;
   precio_unitario: number;
   stock?: number;
+  maquina_id?: string | null;
 };
 
 export function useCatalogo() {
@@ -61,6 +63,7 @@ export function Carrito({
   titulo?: string;
 }) {
   const qc = useQueryClient();
+  const maquinasQ = useMaquinas();
   const [metodo, setMetodo] = useState<string>("efectivo");
   const [descuento, setDescuento] = useState("0");
   const [obs, setObs] = useState("");
@@ -89,6 +92,7 @@ export function Carrito({
         descripcion: i.descripcion,
         cantidad: i.cantidad,
         precio_unitario: i.precio_unitario,
+        maquina_id: i.maquina_id ?? null,
       })),
       p_metodo: metodo as never,
       p_descuento: desc,
@@ -122,7 +126,30 @@ export function Carrito({
             {items.map((i) => (
               <div key={i.key} className="rounded-lg border p-2">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-medium leading-tight">{i.descripcion}</p>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium leading-tight">{i.descripcion}</p>
+                    {i.servicio_id && (
+                      <select
+                        aria-label="Máquina utilizada"
+                        className="mt-1 rounded border bg-background px-1 py-0.5 text-xs"
+                        value={i.maquina_id ?? ""}
+                        onChange={(e) =>
+                          setItems((prev) =>
+                            prev.map((x) => (x.key === i.key ? { ...x, maquina_id: e.target.value || null } : x)),
+                          )
+                        }
+                      >
+                        <option value="">Sin máquina asignada</option>
+                        {(maquinasQ.data ?? [])
+                          .filter((m) => m.activo)
+                          .map((m) => (
+                            <option key={m.id} value={m.id}>
+                              {m.nombre}
+                            </option>
+                          ))}
+                      </select>
+                    )}
+                  </div>
                   <button
                     aria-label="Quitar"
                     onClick={() => setItems((prev) => prev.filter((x) => x.key !== i.key))}
