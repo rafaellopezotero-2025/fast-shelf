@@ -618,6 +618,8 @@ function DetalleEncargo({ id, onClose, onEditar }: { id: string; onClose: () => 
           </TableBody>
         </Table>
 
+        <TrabajosRealizados encargoId={id} activo={e.estado !== "cancelado"} items={items.filter((i) => i.servicio_id)} />
+
         <div className="grid grid-cols-3 gap-2 rounded-lg border p-3 text-center">
           <div><p className="text-xs text-muted-foreground">Total</p><p className="font-semibold tabular">{money(e.total)}</p></div>
           <div><p className="text-xs text-muted-foreground">Pagado</p><p className="font-semibold tabular">{money(e.pagado)}</p></div>
