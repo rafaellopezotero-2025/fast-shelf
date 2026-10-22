@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useCatalogo } from "@/components/Carrito";
 import { fechaHora, labelMetodo, money, METODOS_PAGO } from "@/lib/format";
+import { TrabajosRealizados } from "@/components/TrabajosRealizados";
 import { ESTADOS_ENCARGO, editable, estadoInfo, saldoEncargo, type EstadoEncargo } from "@/lib/encargos";
 
 export const Route = createFileRoute("/_authenticated/encargos")({
