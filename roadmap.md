@@ -7,7 +7,7 @@
 - [x] Guion de carga de estructura desde las migraciones preparado
 - [x] Guiones de respaldo y restauración preparados (ejecución local no validada)
 - [x] Revisión breve sin internet: fuentes locales verificadas; la vista previa aún requiere los servicios en la nube
-- [ ] Corregir configuración local detectada en la revisión: activar ACL y resolver claves en Kong; diferido fuera del alcance de solo revisión
-- [ ] Validación integral sin internet: bloqueada por falta de Docker y de una instalación local en este entorno; requiere configurar direcciones locales y reconstruir la aplicación; diferida fuera de la revisión breve
+- [ ] Completar configuración local: claves, permisos, arranque y selección exclusiva de servicios locales
+- [ ] Validar instalación con autenticación, datos y operaciones sin acceso a internet; registrar cualquier bloqueo real
 - Guía nueva de base de datos local: descartada por el usuario
 - Actualización de seguridad como tarea solicitada: descartada por el usuario; mantenimiento obligatorio de plataforma aplicado
