@@ -106,6 +106,7 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="es">
       <head>
+        {import.meta.env.VITE_LOCAL_ONLY === "true" && <script src="/local-only.js" />}
         <HeadContent />
       </head>
       <body>

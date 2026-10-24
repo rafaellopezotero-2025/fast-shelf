@@ -7,6 +7,9 @@
     "dev": "vite dev",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "build:local": "node scripts/local-config.mjs && vite build --mode offline",
+    "start:local": "node .output/server/index.mjs",
+    "test:local": "node --test scripts/local-config.test.mjs",
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."
