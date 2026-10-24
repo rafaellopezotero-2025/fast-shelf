@@ -4,7 +4,7 @@
 set -euo pipefail
 
 DIR="$(cd "$(dirname "$0")/.." && pwd)"
-ENV_FILE="$DIR/docker/supabase/.env"
+ENV_FILE="$DIR/docker/supabase/.env.local"
 CONTAINER="libreria-db"
 ARCHIVO="${1:-}"
 

@@ -68,3 +68,10 @@ $$;
 
 GRANT EXECUTE ON FUNCTION auth.jwt(), auth.uid(), auth.role(), auth.email()
   TO anon, authenticated, service_role;
+
+-- GoTrue's own migrations replace these helpers on first startup.
+-- They must belong to its migration role, not to the bootstrap superuser.
+ALTER FUNCTION auth.jwt() OWNER TO supabase_auth_admin;
+ALTER FUNCTION auth.uid() OWNER TO supabase_auth_admin;
+ALTER FUNCTION auth.role() OWNER TO supabase_auth_admin;
+ALTER FUNCTION auth.email() OWNER TO supabase_auth_admin;

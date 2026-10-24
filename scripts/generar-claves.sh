@@ -4,7 +4,13 @@
 set -euo pipefail
 
 DIR="$(cd "$(dirname "$0")/.." && pwd)"
-ENV_FILE="$DIR/docker/supabase/.env"
+ENV_FILE="$DIR/docker/supabase/.env.local"
+umask 077
+
+if [ -f "$ENV_FILE" ] && grep -q '^JWT_SECRET=.' "$ENV_FILE"; then
+  echo "Las claves locales ya existen; no se regeneran para conservar usuarios y sesiones."
+  exit 0
+fi
 
 if [ ! -f "$ENV_FILE" ]; then
   cp "$DIR/docker/supabase/.env.example" "$ENV_FILE"
@@ -41,8 +47,8 @@ set('ANON_KEY', token('anon'));
 set('SERVICE_ROLE_KEY', token('service_role'));
 fs.writeFileSync(file, env);
 
-console.log('\nClaves generadas. Para el archivo .env del sistema usá:\n');
-console.log('VITE_SUPABASE_PUBLISHABLE_KEY=' + token('anon'));
+fs.chmodSync(file, 0o600);
+console.log('Claves locales generadas y guardadas sin mostrarlas.');
 JS
 
 echo
