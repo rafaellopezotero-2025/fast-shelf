@@ -31,12 +31,12 @@ services:
         condition: service_healthy
     environment:
       GOTRUE_API_HOST: 0.0.0.0
-      PORT: 9999
+      GOTRUE_API_PORT: 9999
       API_EXTERNAL_URL: ${PUBLIC_URL}
       GOTRUE_DB_DRIVER: postgres
       GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@db:5432/postgres?search_path=auth&sslmode=disable
       GOTRUE_SITE_URL: ${SITE_URL}
-      GOTRUE_URI_ALLOW_LIST: "*"
+      GOTRUE_URI_ALLOW_LIST: ${SITE_URL}
       GOTRUE_DISABLE_SIGNUP: "false"
       GOTRUE_JWT_SECRET: ${JWT_SECRET}
       GOTRUE_JWT_EXP: 3600
@@ -73,11 +73,12 @@ services:
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
       KONG_DNS_ORDER: LAST,A,CNAME
-      KONG_PLUGINS: request-transformer,cors,key-auth
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl
     volumes:
-      - ./kong.yml:/home/kong/kong.yml:ro
+      - ./kong.generated.local.yml:/home/kong/kong.yml:ro
 
   studio:
+    profiles: [administracion]
     image: supabase/studio:20250224-d10db0f
     container_name: libreria-studio
     restart: unless-stopped
@@ -96,6 +97,7 @@ services:
       DEFAULT_PROJECT_NAME: Libreria
 
   meta:
+    profiles: [administracion]
     image: supabase/postgres-meta:v0.86.1
     container_name: libreria-meta
     restart: unless-stopped

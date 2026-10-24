@@ -28,7 +28,7 @@ export function validateLocalUrl(value, name) {
 
 export function prepareLocalConfig(root) {
   const dir = path.join(root, 'docker/supabase');
-  const env = readEnv(path.join(dir, '.env'));
+  const env = readEnv(path.join(dir, '.env.local'));
   const api = validateLocalUrl(env.PUBLIC_URL, 'PUBLIC_URL');
   const site = validateLocalUrl(env.SITE_URL, 'SITE_URL');
   for (const key of ['POSTGRES_PASSWORD', 'JWT_SECRET', 'ANON_KEY', 'SERVICE_ROLE_KEY']) {

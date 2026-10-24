@@ -5,7 +5,7 @@
 set -euo pipefail
 
 DIR="$(cd "$(dirname "$0")/.." && pwd)"
-ENV_FILE="$DIR/docker/supabase/.env"
+ENV_FILE="$DIR/docker/supabase/.env.local"
 CONTAINER="libreria-db"
 
 [ -f "$ENV_FILE" ] || { echo "Falta $ENV_FILE. Ejecutá antes: bash scripts/generar-claves.sh"; exit 1; }
@@ -18,10 +18,13 @@ for i in $(seq 1 60); do
   docker exec "$CONTAINER" pg_isready -U postgres -d postgres >/dev/null 2>&1 && break
   sleep 2
 done
+docker exec "$CONTAINER" pg_isready -U postgres -d postgres >/dev/null 2>&1 || { echo "La base local no inició."; exit 1; }
 
 echo "Ajustando contraseñas internas..."
-psql_run -c "ALTER ROLE authenticator WITH PASSWORD '$POSTGRES_PASSWORD';" \
-         -c "ALTER ROLE supabase_auth_admin WITH PASSWORD '$POSTGRES_PASSWORD';" >/dev/null
+psql_run --set=db_password="$POSTGRES_PASSWORD" <<'SQL' >/dev/null
+ALTER ROLE authenticator WITH PASSWORD :'db_password';
+ALTER ROLE supabase_auth_admin WITH PASSWORD :'db_password';
+SQL
 
 echo "Esperando el servicio de usuarios (crea la tabla de cuentas)..."
 for i in $(seq 1 60); do
@@ -30,9 +33,14 @@ for i in $(seq 1 60); do
   fi
   sleep 2
 done
+psql_run -tAc "SELECT to_regclass('auth.users') IS NOT NULL" | grep -q t || { echo "El servicio de usuarios local no inició."; exit 1; }
 
 echo "Registro de migraciones..."
-psql_run -c "CREATE TABLE IF NOT EXISTS public._migraciones_aplicadas (archivo text PRIMARY KEY, aplicada_at timestamptz NOT NULL DEFAULT now());" >/dev/null
+psql_run <<'SQL' >/dev/null
+CREATE TABLE IF NOT EXISTS public._migraciones_aplicadas (archivo text PRIMARY KEY, aplicada_at timestamptz NOT NULL DEFAULT now());
+GRANT ALL ON public._migraciones_aplicadas TO service_role;
+ALTER TABLE public._migraciones_aplicadas ENABLE ROW LEVEL SECURITY;
+SQL
 
 for f in "$DIR"/supabase/migrations/*.sql; do
   name="$(basename "$f")"
@@ -41,9 +49,9 @@ for f in "$DIR"/supabase/migrations/*.sql; do
     continue
   fi
   echo "  - aplicando $name"
-  psql_run < "$f"
-  psql_run -c "INSERT INTO public._migraciones_aplicadas (archivo) VALUES ('$name');" >/dev/null
+  { printf 'BEGIN;\n'; cat "$f"; printf "\nINSERT INTO public._migraciones_aplicadas (archivo) VALUES ('%s');\nCOMMIT;\n" "$name"; } | psql_run >/dev/null
 done
+docker exec libreria-rest kill -USR1 1
 
 echo
 echo "Base local lista. El primer usuario que se registre en el sistema queda como administrador."
