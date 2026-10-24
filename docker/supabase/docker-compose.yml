@@ -26,6 +26,7 @@ services:
     image: supabase/gotrue:v2.170.0
     container_name: libreria-auth
     restart: unless-stopped
+    command: ["sh", "-c", "auth migrate && auth serve"]
     depends_on:
       db:
         condition: service_healthy
