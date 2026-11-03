@@ -17,6 +17,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Acceso al sistema de gestión de la librería y papelería." },
       { property: "og:title", content: "Ingresar — Gestión de Librería" },
       { property: "og:description", content: "Acceso al sistema de gestión de la librería y papelería." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AuthPage,

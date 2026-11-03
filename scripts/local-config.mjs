@@ -26,6 +26,17 @@ export function validateLocalUrl(value, name) {
   return url.origin;
 }
 
+export function readOfflineBuildEnv(root) {
+  // Read this file directly: inherited CI/host VITE variables cannot override it.
+  const env = readEnv(path.join(root, '.env.offline.local'));
+  const allowed = ['VITE_SUPABASE_URL', 'VITE_SUPABASE_PUBLISHABLE_KEY', 'VITE_SUPABASE_PROJECT_ID', 'VITE_LOCAL_ONLY', 'VITE_LOCAL_SITE_URL'];
+  if (Object.keys(env).some(key => !allowed.includes(key))) throw new Error('La configuración offline contiene variables no permitidas.');
+  validateLocalUrl(env.VITE_SUPABASE_URL, 'VITE_SUPABASE_URL');
+  validateLocalUrl(env.VITE_LOCAL_SITE_URL, 'VITE_LOCAL_SITE_URL');
+  if (env.VITE_LOCAL_ONLY !== 'true' || !env.VITE_SUPABASE_PUBLISHABLE_KEY) throw new Error('Configuración offline incompleta.');
+  return env;
+}
+
 export function prepareLocalConfig(root) {
   const dir = path.join(root, 'docker/supabase');
   const env = readEnv(path.join(dir, '.env.local'));
