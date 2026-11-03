@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Genera las claves de la base local y las escribe en docker/supabase/.env
+# Genera las claves de la base local y las escribe en docker/supabase/.env.local
 # Uso:  bash scripts/generar-claves.sh
 set -euo pipefail
 

@@ -1,6 +1,6 @@
 # Base de datos local para el sistema de librería/papelería.
 # Levanta: PostgreSQL + autenticación (GoTrue) + capa de datos (PostgREST) + Kong + Studio.
-# Uso:  cd docker/supabase && docker compose up -d
+# Arranque sin descargas: bash scripts/start-local.sh
 services:
   db:
     image: supabase/postgres:15.8.1.060
@@ -65,6 +65,9 @@ services:
     image: kong:2.8.1
     container_name: libreria-api
     restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - 'umask 077; sed -e "s|\$${ANON_KEY}|$$ANON_KEY|g" -e "s|\$${SERVICE_ROLE_KEY}|$$SERVICE_ROLE_KEY|g" /home/kong/kong.template.yml > /tmp/kong.yml; exec /docker-entrypoint.sh kong docker-start'
     depends_on:
       - auth
       - rest
@@ -72,11 +75,13 @@ services:
       - "${API_PORT:-8000}:8000"
     environment:
       KONG_DATABASE: "off"
-      KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
+      KONG_DECLARATIVE_CONFIG: /tmp/kong.yml
+      ANON_KEY: ${ANON_KEY}
+      SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_PLUGINS: request-transformer,cors,key-auth,acl
     volumes:
-      - ./kong.generated.local.yml:/home/kong/kong.yml:ro
+      - ./kong.yml:/home/kong/kong.template.yml:ro
 
   studio:
     profiles: [administracion]
