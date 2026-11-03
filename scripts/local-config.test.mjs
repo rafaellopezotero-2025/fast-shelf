@@ -3,12 +3,26 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { prepareLocalConfig, validateLocalUrl } from './local-config.mjs';
+import { prepareLocalConfig, readOfflineBuildEnv, validateLocalUrl } from './local-config.mjs';
 
 test('La instalación sin internet rechaza una dirección de nube', () => {
   assert.throws(() => validateLocalUrl('https://fast-shelf.lovable.app', 'API'));
   assert.throws(() => validateLocalUrl('https://example.com', 'API'));
   assert.equal(validateLocalUrl('http://192.168.0.10:8000', 'API'), 'http://192.168.0.10:8000');
+});
+
+test('La configuración offline ignora variables de nube heredadas', () => {
+  const root = mkdtempSync(join(tmpdir(), 'offline-env-'));
+  const previous = process.env.VITE_SUPABASE_URL;
+  try {
+    process.env.VITE_SUPABASE_URL = 'https://example.com';
+    writeFileSync(join(root, '.env.offline.local'), 'VITE_SUPABASE_URL=http://127.0.0.1:8000\nVITE_SUPABASE_PUBLISHABLE_KEY=test.public.key\nVITE_LOCAL_ONLY=true\nVITE_LOCAL_SITE_URL=http://127.0.0.1:3000\n');
+    assert.equal(readOfflineBuildEnv(root).VITE_SUPABASE_URL, 'http://127.0.0.1:8000');
+  } finally {
+    if (previous === undefined) delete process.env.VITE_SUPABASE_URL;
+    else process.env.VITE_SUPABASE_URL = previous;
+    rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('La aplicación local no recibe contraseñas ni claves de servicio', () => {

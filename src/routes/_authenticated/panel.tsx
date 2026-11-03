@@ -31,6 +31,8 @@ export const Route = createFileRoute("/_authenticated/panel")({
       { name: "description", content: "Resumen de ventas, ingresos, fotocopias y alertas de stock." },
       { property: "og:title", content: "Dashboard — Gestión de Librería" },
       { property: "og:description", content: "Resumen de ventas, ingresos, fotocopias y alertas de stock." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Panel,
