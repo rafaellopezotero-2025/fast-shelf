@@ -17,7 +17,12 @@ async function request(route, key, token, method = 'GET', body) {
   return response.status === 204 ? null : response.json();
 }
 try {
-  const page = await fetch(site, { signal: AbortSignal.timeout(15000) });
+  const page = await fetch(site, { signal: AbortSignal.timeout(15000) }).catch(() => {
+    throw new Error(`No responde la aplicación en ${site}. Revisá que el servicio esté iniciado y que SITE_URL tenga la IP correcta.`);
+  });
+  await fetch(`${api}/auth/v1/health`, { headers: { apikey: env.ANON_KEY }, signal: AbortSignal.timeout(15000) }).catch(() => {
+    throw new Error(`No responde la base local en ${api}. Ejecutá bash scripts/start-local.sh y revisá PUBLIC_URL.`);
+  });
   if (!page.ok || !(await page.text()).includes('/local-only.js')) throw new Error('La aplicación no está instalada en modo local exclusivo.');
   const adminRoles = await request('/rest/v1/user_roles?role=eq.admin&select=id&limit=1', env.SERVICE_ROLE_KEY, env.SERVICE_ROLE_KEY);
   if (!adminRoles.length) throw new Error('Creá primero tu cuenta administradora local; esta prueba no debe convertirse en administrador.');
