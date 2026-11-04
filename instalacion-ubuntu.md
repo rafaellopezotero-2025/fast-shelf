@@ -57,12 +57,14 @@ git clone <URL-DEL-REPOSITORIO> libreria
 cd libreria
 ```
 
-O si tenés el ZIP:
+O si tenés el ZIP (el archivo viene con una carpeta `fast-shelf/` adentro):
 
 ```bash
 cd ~
-unzip proyecto.zip -d libreria
+unzip fast-shelf.zip
+mv fast-shelf libreria
 cd libreria
+ls package.json   # tiene que existir acá; si no, estás en la carpeta equivocada
 ```
 
 ## Paso 5 — Instalar las dependencias
@@ -72,6 +74,10 @@ npm install
 ```
 
 Tarda unos minutos la primera vez.
+
+> **No lo corras con `sudo`.** Si lo hacés, los archivos quedan propiedad de root y después
+> el sitio no puede leerlos. Si ya lo corriste con sudo, arreglalo con
+> `sudo chown -R TU_USUARIO:TU_USUARIO ~/libreria`.
 
 ## Paso 6 — Crear el archivo de configuración `.env`
 
