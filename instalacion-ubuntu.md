@@ -75,6 +75,10 @@ npm install
 
 Tarda unos minutos la primera vez.
 
+> **No lo corras con `sudo`.** Si lo hacés, los archivos quedan propiedad de root y después
+> el sitio no puede leerlos. Si ya lo corriste con sudo, arreglalo con
+> `sudo chown -R TU_USUARIO:TU_USUARIO ~/libreria`.
+
 ## Paso 6 — Crear el archivo de configuración `.env`
 
 En la carpeta del proyecto:
