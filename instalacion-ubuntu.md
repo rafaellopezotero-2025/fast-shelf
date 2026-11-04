@@ -57,12 +57,14 @@ git clone <URL-DEL-REPOSITORIO> libreria
 cd libreria
 ```
 
-O si tenés el ZIP:
+O si tenés el ZIP (el archivo viene con una carpeta `fast-shelf/` adentro):
 
 ```bash
 cd ~
-unzip proyecto.zip -d libreria
+unzip fast-shelf.zip
+mv fast-shelf libreria
 cd libreria
+ls package.json   # tiene que existir acá; si no, estás en la carpeta equivocada
 ```
 
 ## Paso 5 — Instalar las dependencias
