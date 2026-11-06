@@ -1,0 +1,44 @@
+FAST-SHELF — INSTALACIÓN LOCAL CON DOCKER COMPOSE
+
+REQUISITOS
+- Servidor Ubuntu limpio con Docker Engine y Docker Compose instalados.
+- Conexión a internet durante la primera puesta en marcha para descargar imágenes
+  de Docker e instalar dependencias de la aplicación.
+- El archivo fast-shelf_261104.backup.zip del repositorio, junto a compose.yaml.
+- El paquete ya incluye fast-shelf.zip, el código de la aplicación.
+- El ZIP del backup debe contener el archivo PostgreSQL .backup, .dump o .tar.
+
+INSTALACIÓN
+1. Descomprimí este paquete en una carpeta del servidor.
+2. Copiá fast-shelf_261104.backup.zip a esa carpeta.
+3. Desde esa carpeta ejecutá:
+
+       docker compose up -d
+
+El primer inicio extrae y compila la aplicación, detecta la IP LAN del servidor,
+genera claves privadas locales, levanta PostgreSQL y los servicios Supabase,
+aplica las migraciones e importa del backup usuarios, perfiles y roles, incluido
+el administrador. Las claves se generan en el servidor y no se muestran.
+
+USO
+Abrí desde una computadora de la misma red local:
+
+       http://IP-DEL-SERVIDOR:3000
+
+La API queda en el puerto 8000. Los servicios se reinician automáticamente al
+reiniciar Docker o el servidor. Una vez instalado, el sistema funciona en la red
+local sin depender de internet.
+
+DATOS Y SEGURIDAD
+- PostgreSQL persiste en el volumen Docker fast-shelf_db-data.
+- La aplicación y sus claves persisten en fast-shelf_app-data.
+- Mantené el backup original privado: contiene cuentas y hashes de contraseñas.
+- No borres los volúmenes para reiniciar o actualizar los servicios.
+- Ver estado: docker compose ps
+- Ver registros: docker compose logs -f
+- Detener sin borrar datos: docker compose down
+
+RESTAURACIÓN DEL ADMINISTRADOR
+El backup se importa solo si la base está vacía. Se copian las tablas auth.users,
+auth.identities, public.profiles y public.user_roles. Si ya hay usuarios locales,
+se omite la importación para evitar duplicados.
