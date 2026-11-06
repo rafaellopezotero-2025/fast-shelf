@@ -1,44 +1,150 @@
-FAST-SHELF — INSTALACIÓN LOCAL CON DOCKER COMPOSE
+FAST-SHELF — INSTALACIÓN LOCAL EN UBUNTU
+========================================
 
-REQUISITOS
-- Servidor Ubuntu limpio con Docker Engine y Docker Compose instalados.
-- Conexión a internet durante la primera puesta en marcha para descargar imágenes
-  de Docker e instalar dependencias de la aplicación.
-- El archivo fast-shelf_261104.backup.zip del repositorio, junto a compose.yaml.
-- El paquete ya incluye fast-shelf.zip, el código de la aplicación.
-- El ZIP del backup debe contener el archivo PostgreSQL .backup, .dump o .tar.
+Este documento está pensado para poder seguirlo sin consultar el chat.
+El paquete incluye compose.yaml, los scripts de instalación y fast-shelf.zip
+(el código de la aplicación). También necesitás el ZIP del backup, que contiene
+la cuenta administradora que ya usabas.
 
-INSTALACIÓN
-1. Descomprimí este paquete en una carpeta del servidor.
-2. Copiá fast-shelf_261104.backup.zip a esa carpeta.
-3. Desde esa carpeta ejecutá:
+1. DESCARGAR LOS ARCHIVOS
+-------------------------
 
-       docker compose up -d
+A. Descargá y guardá fast-shelf-instalador-compose.zip desde el chat donde te
+   entregaron este archivo. Transferilo al servidor por USB, WinSCP o SCP.
 
-El primer inicio extrae y compila la aplicación, detecta la IP LAN del servidor,
-genera claves privadas locales, levanta PostgreSQL y los servicios Supabase,
-aplica las migraciones e importa del backup usuarios, perfiles y roles, incluido
-el administrador. Las claves se generan en el servidor y no se muestran.
+B. Descargá fast-shelf_261104.backup.zip desde la carpeta descargables del repo:
+   https://github.com/rafaellopezotero-2025/fast-shelf/tree/main/descargables
+   En GitHub abrí fast-shelf_261104.backup.zip y elegí Download.
 
-USO
-Abrí desde una computadora de la misma red local:
+El paquete del instalador ya trae fast-shelf.zip; no hace falta bajarlo aparte.
+No instales Supabase por separado: Compose descarga y levanta PostgreSQL,
+GoTrue, PostgREST y Kong como parte de la instalación.
+El backup contiene cuentas y hashes de contraseñas. Mantenelo privado y no lo
+subas a un repositorio público.
 
-       http://IP-DEL-SERVIDOR:3000
+2. INSTALAR DOCKER ENGINE Y DOCKER COMPOSE EN UBUNTU
+---------------------------------------------------
 
-La API queda en el puerto 8000. Los servicios se reinician automáticamente al
-reiniciar Docker o el servidor. Una vez instalado, el sistema funciona en la red
-local sin depender de internet.
+Ejecutá estos comandos en una terminal del servidor Ubuntu. Instalan Docker
+desde el repositorio oficial e incluyen el plugin Docker Compose:
 
-DATOS Y SEGURIDAD
-- PostgreSQL persiste en el volumen Docker fast-shelf_db-data.
-- La aplicación y sus claves persisten en fast-shelf_app-data.
-- Mantené el backup original privado: contiene cuentas y hashes de contraseñas.
-- No borres los volúmenes para reiniciar o actualizar los servicios.
-- Ver estado: docker compose ps
-- Ver registros: docker compose logs -f
-- Detener sin borrar datos: docker compose down
+    sudo apt update
+    sudo apt install ca-certificates curl
+    sudo install -m 0755 -d /etc/apt/keyrings
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl enable --now docker
 
-RESTAURACIÓN DEL ADMINISTRADOR
-El backup se importa solo si la base está vacía. Se copian las tablas auth.users,
-auth.identities, public.profiles y public.user_roles. Si ya hay usuarios locales,
-se omite la importación para evitar duplicados.
+Comprobá Docker y Compose:
+
+    sudo docker run hello-world
+    docker compose version
+
+Guía oficial de Docker:
+https://docs.docker.com/engine/install/ubuntu/
+
+3. COPIAR Y DESCOMPRIMIR LOS ARCHIVOS
+-------------------------------------
+
+Copiá fast-shelf-instalador-compose.zip y fast-shelf_261104.backup.zip al
+servidor. Podés usar WinSCP para colocarlos en la carpeta personal del usuario
+administrador (/home/USUARIO). Después, en SSH, ejecutá:
+
+    mkdir -p "$HOME/fast-shelf"
+    sudo apt install unzip
+    unzip "$HOME/fast-shelf-instalador-compose.zip" -d "$HOME/fast-shelf"
+    cp "$HOME/fast-shelf_261104.backup.zip" "$HOME/fast-shelf/"
+    cd "$HOME/fast-shelf"
+    ls -l
+
+Antes de continuar, en esa carpeta deben estar compose.yaml, fast-shelf.zip,
+la carpeta entrypoints y fast-shelf_261104.backup.zip.
+
+Podés elegir otra carpeta; mantené juntos compose.yaml y los dos ZIP.
+
+4. INSTALAR Y ARRANCAR CON UN COMANDO
+-------------------------------------
+
+La primera instalación necesita internet para descargar las imágenes de Docker
+y las dependencias de la app. Desde la carpeta que contiene compose.yaml ejecutá:
+
+    sudo docker compose up -d
+
+La preparación compila la aplicación, detecta la IP del servidor, genera claves
+locales, inicia PostgreSQL/Supabase, aplica las migraciones e importa del backup
+los usuarios, identidades, perfiles y roles. El administrador conserva su correo
+y contraseña del backup. Las claves generadas quedan guardadas en volúmenes Docker.
+
+La primera ejecución puede tardar varios minutos. Revisá el progreso con:
+
+    sudo docker compose ps -a
+    sudo docker compose logs -f preparar inicializar app
+
+5. ABRIR LA APLICACIÓN
+----------------------
+
+En el servidor, consultá su IP de red local:
+
+    ip -4 -br addr
+
+Buscá la IP de la interfaz conectada a la red (por ejemplo, 192.168.0.246).
+Desde otra computadora conectada a la misma red, abrí:
+
+    http://192.168.0.246:3000
+
+Reemplazá el ejemplo por la IP real del servidor. La API local usa el puerto
+8000. No configures redirecciones de estos puertos desde internet.
+
+6. USO DIARIO Y REINICIO AUTOMÁTICO
+-----------------------------------
+
+Ver estado:
+
+    sudo docker compose ps
+
+Ver registros:
+
+    sudo docker compose logs -f
+
+Detener servicios sin borrar datos:
+
+    sudo docker compose down
+
+Volver a iniciarlos:
+
+    sudo docker compose up -d
+
+Docker queda habilitado al iniciar Ubuntu y los contenedores principales usan
+reinicio automático. Después de completar la instalación, el sistema sirve en
+la red local sin internet; no borres los volúmenes Docker.
+
+7. DATOS Y BACKUP
+-----------------
+
+- La base de datos se guarda en el volumen fast-shelf_db-data.
+- La aplicación, compilación y claves se guardan en fast-shelf_app-data.
+- docker compose down conserva ambos volúmenes.
+- No uses docker compose down -v: ese comando borraría los volúmenes y los datos.
+- El backup se importa únicamente cuando auth.users está vacío, para evitar
+  duplicar cuentas en una instalación que ya tenga usuarios.
+
+Si la instalación falla, guardá la salida de:
+
+    sudo docker compose ps -a
+    sudo docker compose logs --tail=200 preparar db auth rest kong inicializar app
+
+NOTA DE SEGURIDAD
+-----------------
+El backup del repositorio incluye datos de autenticación y hashes de contraseña.
+Retiralo del repositorio público y almacenalo en privado. Un hash no revela la
+contraseña en texto plano por sí solo, pero esos datos no deben quedar públicos.
